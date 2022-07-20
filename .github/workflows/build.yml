@@ -10,10 +10,10 @@ on:
   workflow_dispatch:
 
 env:
-  ASEPRITE_VERSION: 1.2.35
+  ASEPRITE_VERSION: 1.2.37
   # RelWithDebInfo, Release
   BUILD_TYPE: Release
-  CMAKE_VERSION: 3.22.5
+  CMAKE_VERSION: 3.23.2
   NINJA_VERSION: 1.11.0
   # gcc: m81-b607b32047, clang: m96-2f1f21b8a9, m102-861e4743af
   SKIA_VERSION: m102-861e4743af
@@ -40,23 +40,25 @@ jobs:
             # set default parameters and call VsDevCmd.bat to set up the specified build architecture environment
             # https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-160
             # Or call "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/Tools/VsDevCmd.bat" -arch=x64
+            # "C:/Program Files/Microsoft Visual Studio/2022/Enterprise"
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
         - {
             # (x86_64)
-            # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md
-            name: "Ubuntu 20.04 Clang", 
+            # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2204-Readme.md
+            name: "Ubuntu 22.04 Clang", 
             artifact: "Linux.7z",
-            os: ubuntu-20.04,
+            os: ubuntu-22.04,
             # cc: "gcc", cxx: "g++"
             cc: "clang", cxx: "clang++" # from Aseprite 1.2.31 due to skia upgrade to m96-2f1f21b8a9 from m81-b607b32047.
           }
         - { 
             # (x86_64)
-            # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md
-            name: "macOS 10.15 Clang", 
+            # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-12-Readme.md
+            # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-12-Readme.md#installed-sdks
+            name: "macOS 12 Clang", 
             artifact: "macOS.7z",
-            os: macos-10.15,
+            os: macos-12,
             cc: "clang", cxx: "clang++"
           }
 
@@ -85,7 +87,7 @@ jobs:
         if: runner.os == 'Linux'
         uses: KyleMayes/install-llvm-action@v1
         with:
-          version: "13"
+          version: "14"
 
       - name: Print Clang version
         if: runner.os == 'Linux'
@@ -93,13 +95,12 @@ jobs:
         run: clang --version
 
       - name: Install Dependencies on Linux
+        if: runner.os == 'Linux'
         shell: bash
         run: |
-          if [[ "${{ runner.os }}" == "Linux" ]] ; then
-            sudo apt-get -y -qq update
-            sudo apt-get -y install libc++-dev
-            sudo apt-get -y --no-install-recommends install libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev libfontconfig1-dev
-          fi
+          sudo apt-get -y -qq update
+          sudo apt-get -y install libc++-dev
+          sudo apt-get -y --no-install-recommends install libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev libfontconfig1-dev
 
       - name: Download Skia and Other Dependencies
         shell: cmake -P {0}
@@ -261,7 +262,7 @@ jobs:
                 -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
                 -D CMAKE_OSX_ARCHITECTURES=x86_64
                 -D CMAKE_OSX_DEPLOYMENT_TARGET=10.9
-                -D CMAKE_OSX_SYSROOT=/Applications/Xcode_12.1.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk
+                -D CMAKE_OSX_SYSROOT=/Applications/Xcode_13.4.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk
                 -D LAF_BACKEND=skia
                 -D LAF_WITH_EXAMPLES=OFF
                 -D LAF_WITH_TESTS=OFF
