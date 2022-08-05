@@ -10,12 +10,12 @@ on:
   workflow_dispatch:
 
 env:
-  ASEPRITE_VERSION: 1.2.37
+  ASEPRITE_VERSION: 1.2.39
   # RelWithDebInfo, Release
   BUILD_TYPE: Release
-  CMAKE_VERSION: 3.23.2
+  CMAKE_VERSION: 3.24.0
   NINJA_VERSION: 1.11.0
-  # gcc: m81-b607b32047, clang: m96-2f1f21b8a9, m102-861e4743af
+  # gcc: m81-b607b32047, clang: m96-2f1f21b8a9 (Skia-Linux-Release-x64.zip), m102-861e4743af (Skia-Linux-Release-x64-libc++.zip)
   SKIA_VERSION: m102-861e4743af
   # CCACHE_VERSION: 4.6
   # ARCH: x86_64
@@ -83,11 +83,11 @@ jobs:
         shell: bash
         run: sudo apt-get remove --auto-remove clang llvm -y
 
-      - name: Install LLVM and Clang
-        if: runner.os == 'Linux'
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: "14"
+      # - name: Install LLVM and Clang
+      #   if: runner.os == 'Linux'
+      #   uses: KyleMayes/install-llvm-action@v1
+      #   with:
+      #     version: "14"
 
       - name: Print Clang version
         if: runner.os == 'Linux'
@@ -96,10 +96,11 @@ jobs:
 
       - name: Install Dependencies on Linux
         if: runner.os == 'Linux'
+        # clang libc++-dev libc++abi-dev
         shell: bash
         run: |
           sudo apt-get -y -qq update
-          sudo apt-get -y install libc++-dev
+          sudo apt-get -y install clang-14 libc++-14-dev libc++abi-14-dev
           sudo apt-get -y --no-install-recommends install libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev libfontconfig1-dev
 
       - name: Download Skia and Other Dependencies
@@ -111,7 +112,7 @@ jobs:
           if ("${{ runner.os }}" STREQUAL "Windows")
             set(skia_suffix "Windows-Release-x64.zip")
           elseif ("${{ runner.os }}" STREQUAL "Linux")
-            set(skia_suffix "Linux-Release-x64.zip")
+            set(skia_suffix "Linux-Release-x64-libc++.zip")
           elseif ("${{ runner.os }}" STREQUAL "macOS")
             set(skia_suffix "macOS-Release-x64.zip")
           endif()
@@ -223,6 +224,8 @@ jobs:
                 -S .
                 -B build
                 -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+                -D ENABLE_SENTRY=OFF
+                -D ENABLE_CCACHE=OFF
                 -D LAF_BACKEND=skia
                 -D LAF_WITH_EXAMPLES=OFF
                 -D LAF_WITH_TESTS=OFF
@@ -243,7 +246,8 @@ jobs:
                 -D CMAKE_CXX_FLAGS=-stdlib=libc++
                 -D CMAKE_EXE_LINKER_FLAGS=-stdlib=libc++
                 -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
-                -D LAF_BACKEND_LINK_FLAGS=-Wl,--allow-multiple-definition
+                -D ENABLE_SENTRY=OFF
+                -D ENABLE_CCACHE=OFF
                 -D LAF_BACKEND=skia
                 -D LAF_WITH_EXAMPLES=OFF
                 -D LAF_WITH_TESTS=OFF
@@ -263,6 +267,8 @@ jobs:
                 -D CMAKE_OSX_ARCHITECTURES=x86_64
                 -D CMAKE_OSX_DEPLOYMENT_TARGET=10.9
                 -D CMAKE_OSX_SYSROOT=/Applications/Xcode_13.4.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk
+                -D ENABLE_SENTRY=OFF
+                -D ENABLE_CCACHE=OFF
                 -D LAF_BACKEND=skia
                 -D LAF_WITH_EXAMPLES=OFF
                 -D LAF_WITH_TESTS=OFF
