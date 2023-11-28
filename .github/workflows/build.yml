@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  ASEPRITE_VERSION: '1.3-rc9'
+  ASEPRITE_VERSION: '1.3'
   # RelWithDebInfo, Release
   BUILD_TYPE: Release
   CMAKE_VERSION: '3.27.8'
