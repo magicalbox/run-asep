@@ -10,13 +10,13 @@ on:
   workflow_dispatch:
 
 env:
-  ASEPRITE_VERSION: '1.3.13'
+  ASEPRITE_VERSION: '1.3.14.1'
   # RelWithDebInfo, Release
   BUILD_TYPE: Release
-  CMAKE_VERSION: '3.31.6'
+  CMAKE_VERSION: '4.0.2'
   NINJA_VERSION: '1.12.1'
-  # gcc: m81-b607b32047, clang: m96-2f1f21b8a9 (Skia-Linux-Release-x64.zip), m102-861e4743af (Skia-Linux-Release-x64-libc++.zip)
-  SKIA_VERSION: 'm102-861e4743af'
+  # gcc: m81-b607b32047, clang: m96-2f1f21b8a9 (Skia-Linux-Release-x64.zip), m102-861e4743af (Skia-Linux-Release-x64-libc++.zip), m124-08a5439a6b (Skia-Linux-Release-x64.zip)
+  SKIA_VERSION: 'm124-08a5439a6b'
   # CCACHE_VERSION: 4.6
   # ARCH: x86_64
   ARTIFACT_RETENTION_DAYS: 1
@@ -118,7 +118,7 @@ jobs:
           if ("${{ runner.os }}" STREQUAL "Windows")
             set(skia_suffix "Windows-Release-x64.zip")
           elseif ("${{ runner.os }}" STREQUAL "Linux")
-            set(skia_suffix "Linux-Release-x64-libc++.zip")
+            set(skia_suffix "Linux-Release-x64.zip")
           elseif ("${{ runner.os }}" STREQUAL "macOS")
             set(skia_suffix "macOS-Release-x64.zip")
           endif()
@@ -249,8 +249,8 @@ jobs:
                 -B build
                 -D CMAKE_C_COMPILER=clang
                 -D CMAKE_CXX_COMPILER=clang++
-                -D CMAKE_CXX_FLAGS=-stdlib=libc++
-                -D CMAKE_EXE_LINKER_FLAGS=-stdlib=libc++
+                -D CMAKE_CXX_FLAGS=-stdlib=libstdc++
+                -D CMAKE_EXE_LINKER_FLAGS=-stdlib=libstdc++
                 -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
                 -D ENABLE_SENTRY=OFF
                 -D ENABLE_CCACHE=OFF
