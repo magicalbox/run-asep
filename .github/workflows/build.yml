@@ -10,11 +10,11 @@ on:
   workflow_dispatch:
 
 env:
-  ASEPRITE_VERSION: '1.3.15.4'
+  ASEPRITE_VERSION: '1.3.16'
   # RelWithDebInfo, Release
   BUILD_TYPE: Release
-  CMAKE_VERSION: '4.1.2'
-  NINJA_VERSION: '1.13.1'
+  CMAKE_VERSION: '4.2.1'
+  NINJA_VERSION: '1.13.2'
   # gcc: m81-b607b32047, clang: m96-2f1f21b8a9 (Skia-Linux-Release-x64.zip), m102-861e4743af (Skia-Linux-Release-x64-libc++.zip), m124-08a5439a6b (Skia-Linux-Release-x64.zip)
   SKIA_VERSION: 'm124-08a5439a6b'
   # CCACHE_VERSION: 4.6
@@ -148,8 +148,8 @@ jobs:
             set(cmake_dir "cmake-${cmake_version}-Linux-x86_64/bin")
           elseif ("${{ runner.os }}" STREQUAL "macOS")
             set(ninja_suffix "mac.zip")
-            set(cmake_suffix "Darwin-x86_64.tar.gz")
-            set(cmake_dir "cmake-${cmake_version}-Darwin-x86_64/CMake.app/Contents/bin")
+            set(cmake_suffix "macos-universal.tar.gz")
+            set(cmake_dir "cmake-${cmake_version}-macos-universal/CMake.app/Contents/bin")
           endif()
 
           set(ninja_url "https://github.com/ninja-build/ninja/releases/download/v${ninja_version}/ninja-${ninja_suffix}")
@@ -324,7 +324,7 @@ jobs:
         run: cmake -E tar cfv ../${{ matrix.config.artifact }} --format=7zip .
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           path: ./${{ matrix.config.artifact }}
           name: ${{ matrix.config.artifact }}
